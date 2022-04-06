@@ -18,39 +18,41 @@ import javax.tools.JavaFileObject;
 
 /**
  * Cloned from https://github.com/javahippie/jukebox (THX Tim!)
- *
+ * <p>
  * This class is used to process the {@code de.fechtelhoff.builder.annotation.Builder} annotation.
  * It will create a builder class for every record on the classpath that is annotated with that annotation.
  */
 @SupportedAnnotationTypes("de.fechtelhoff.builder.annotation.Builder")
 public class RecordBuilder extends AbstractProcessor {
 
+	private static final int INDENTATION = 4;
+	private static final int DOUBLE_INDENTATION = 2 * INDENTATION;
+
 	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
 		try {
 			for (TypeElement annotation : annotations) {
-				for (Element o : roundEnv.getElementsAnnotatedWith(annotation)) {
-					if (o.getKind().equals(ElementKind.RECORD)) {
-						writeSourceFile(o);
+				for (Element element : roundEnvironment.getElementsAnnotatedWith(annotation)) {
+					if (element.getKind().equals(ElementKind.RECORD)) {
+						writeSourceFile(element);
 					}
 				}
 			}
-		} catch (IOException ex) {
+		} catch (IOException exception) {
 			return false;
 		}
 		return true;
 	}
 
 	private void writeSourceFile(Element element) throws IOException {
-		String fqcn = element.asType().toString();
-		int lastDotIndex = fqcn.lastIndexOf('.');
-		String packageName = fqcn.substring(0, lastDotIndex);
-
+		String fullQualifiedClassName = element.asType().toString();
+		int lastDotIndex = fullQualifiedClassName.lastIndexOf('.');
+		String packageName = fullQualifiedClassName.substring(0, lastDotIndex);
 		String className = "%sBuilder".formatted(element.getSimpleName());
 
-		JavaFileObject builderFile = processingEnv.getFiler().createSourceFile("%sBuilder".formatted(fqcn));
+		JavaFileObject builderFile = processingEnv.getFiler().createSourceFile("%sBuilder".formatted(fullQualifiedClassName));
 
-		List<Element> recordComponents = element.getEnclosedElements()
+		List<Element> elements = element.getEnclosedElements()
 			.stream()
 			.filter(e -> e.getKind().equals(ElementKind.RECORD_COMPONENT))
 			.map(Element.class::cast)
@@ -62,18 +64,15 @@ public class RecordBuilder extends AbstractProcessor {
 			renderDocumentationHeader(element.toString(), out);
 			out.println("public class %s {".formatted(className));
 			out.println();
-			renderFields(recordComponents, out);
-			renderPrivateConstructor(className, out);
-			renderBuilderInitializer(className, out);
-			renderBuildMethod(element, recordComponents, out);
-			renderBuilderMethods(className, recordComponents, out);
-
-			out.print("}");
+			renderFields(elements, out);
+			renderBuildMethod(element, elements, out);
+			renderBuilderMethods(className, elements, out);
+			out.println("}");
 		}
 	}
 
 	private void renderDocumentationHeader(String recordName, PrintWriter out) {
-		out.println("""
+		out.print("""
 			/**
 			 * This class is an implementation of the builder pattern for the record %s.
 			 * It was automatically generated on %s in timezone %s.
@@ -83,58 +82,42 @@ public class RecordBuilder extends AbstractProcessor {
 			ZoneId.systemDefault().toString()));
 	}
 
-	private void renderPrivateConstructor(String className, PrintWriter out) {
-		out.println("""
-			    private %s() {
-			        //Instances of this class should be created with the static method 'build()', not the constructor
-			    }
-			""".formatted(className));
+	private void renderFields(List<Element> elements, PrintWriter out) {
+		elements.forEach(element -> printField(element, out));
+		out.println();
 	}
 
-	private void renderBuilderMethods(String className, List<Element> recordComponents, PrintWriter out) {
-		final String formatString = """
-			    public %s %s(%s %s) {
-			        this.%s = %s;
-			        return this;
-			    }
-			""";
-		recordComponents.forEach(
-			component -> out.println(
-				formatString.formatted(
-					className,
-					component.getSimpleName(),
-					component.asType().toString(),
-					component.getSimpleName(),
-					component.getSimpleName(),
-					component.getSimpleName()
-				)
-			)
-		);
+	private void printField(Element element, PrintWriter out) {
+		final String type = element.asType().toString();
+		final String simpleName = element.getSimpleName().toString();
+		out.print(("private " + type + " " + simpleName + ";").indent(INDENTATION));
 	}
 
-	private void renderBuildMethod(Element element, List<Element> recordComponents, PrintWriter out) {
-		out.println("    public %s build() {".formatted(element.getSimpleName()));
-		out.print("        return new %s(".formatted(element.getSimpleName()));
-		out.print(recordComponents.stream()
+	private void renderBuildMethod(Element element, List<Element> elements, PrintWriter out) {
+		out.print("public %s build() {".formatted(element.getSimpleName()).indent(INDENTATION));
+		out.print(" ".repeat(DOUBLE_INDENTATION) +"return new %s(".formatted(element.getSimpleName()));
+		out.print(elements.stream()
 			.map(Element::getSimpleName)
 			.collect(Collectors.joining(", ")));
 		out.println(");");
-		out.println("    }");
-		out.println();
+		out.println("}".indent(INDENTATION));
 	}
 
-	private void renderBuilderInitializer(String className, PrintWriter out) {
-		out.println("""
-			    public static %s builder() {
-			        return new %s();
-			    }
-			""".formatted(className, className));
+	private void renderBuilderMethods(String className, List<Element> elements, PrintWriter out) {
+		elements.forEach(component -> printBuilderMethod(className, component, out));
 	}
 
-	private void renderFields(List<Element> recordComponents, PrintWriter out) {
-		recordComponents.forEach(
-			element -> out.println("    private " + element.asType().toString() + " " + element.getSimpleName() + ";")
-		);
-		out.println();
+	private void printBuilderMethod(String className, Element element, PrintWriter out) {
+		final String simpleName = element.getSimpleName().toString();
+		final String methodName = "with" + capitalize(simpleName);
+		final String type = element.asType().toString();
+		out.print(("public " + className + " " + methodName + "(" + type + " " + simpleName + ") {").indent(INDENTATION));
+		out.print(("this." + simpleName + " = " + simpleName + ";").indent(DOUBLE_INDENTATION));
+		out.print(("return this;").indent(DOUBLE_INDENTATION));
+		out.println(("}").indent(INDENTATION));
+	}
+
+	private String capitalize(final String input) {
+		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
 }

@@ -24,11 +24,11 @@ class PersonTest {
 
 	@Test
 	void Test_with_generated_Builder() {
-		final Person person = PersonBuilder.builder()
-			.firstName(FIRST_NAME)
-			.lastName(LAST_NAME)
-			.birthDate(BIRTHDAY)
-			.heightInCentimeters(HEIGHT)
+		final Person person = new PersonBuilder()
+			.withFirstName(FIRST_NAME)
+			.withLastName(LAST_NAME)
+			.withBirthDate(BIRTHDAY)
+			.withHeightInCentimeters(HEIGHT)
 			.build();
 		checkPerson(person);
 	}

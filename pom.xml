@@ -10,7 +10,7 @@
 
 	<packaging>pom</packaging>
 	<name>record-builder</name>
-	<description>Simple Annotation based Builder Creation for Records</description>
+	<description>Simple Annotation based Builder creation for Records</description>
 
 	<modules>
 		<module>builder</module>
