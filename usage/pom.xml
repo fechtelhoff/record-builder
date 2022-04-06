@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>record-builder</artifactId>
+		<groupId>de.fechtelhoff</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>usage</artifactId>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.fechtelhoff</groupId>
+			<artifactId>builder</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!-- [BGN] Record Builder Annotation Processor Config -->
+					<generatedSourcesDirectory>${project.build.directory}/generated-sources/</generatedSourcesDirectory>
+					<annotationProcessors>
+						<annotationProcessor>de.fechtelhoff.builder.processor.RecordBuilder</annotationProcessor>
+					</annotationProcessors>
+					<!-- [END] Record Builder Annotation Processor Config -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

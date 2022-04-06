@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.fechtelhoff</groupId>
+	<artifactId>record-builder</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+	<name>record-builder</name>
+	<description>Simple Annotation based Builder Creation for Records</description>
+
+	<modules>
+		<module>builder</module>
+		<module>usage</module>
+	</modules>
+
+	<properties>
+		<!-- Application -->
+		<appMainClass>de.fechtelhoff.Start</appMainClass>
+
+		<!-- Encoding  -->
+		<project.encoding>UTF-8</project.encoding>
+		<project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>${project.encoding}</project.reporting.outputEncoding>
+
+		<!-- Java Version -->
+		<java.version>17</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+
+		<!-- Dependency Version -->
+		<version.apache.commons-lang>3.12.0</version.apache.commons-lang>
+		<version.slf4j>1.7.36</version.slf4j>
+		<version.junit>5.8.2</version.junit>
+
+		<!-- Plugin Version -->
+		<version.compiler.plugin>3.9.0</version.compiler.plugin>
+		<version.surefire.plugin>3.0.0-M5</version.surefire.plugin>
+		<version.versions.plugin>2.9.0</version.versions.plugin>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Project Internal Dependencies -->
+			<dependency>
+				<groupId>de.fechtelhoff</groupId>
+				<artifactId>builder</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- JUnit 5 -->
+			<!-- https://junit.org/junit5 -->
+			<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${version.junit}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!-- JUnit 5 -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+
+		<pluginManagement>
+			<plugins>
+				<!-- Compiler -->
+				<!-- https://maven.apache.org/plugins/maven-compiler-plugin -->
+				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${version.compiler.plugin}</version>
+					<configuration>
+						<release>${java.version}</release>
+						<encoding>${project.encoding}</encoding>
+						<showWarnings>true</showWarnings>
+						<showDeprecation>true</showDeprecation>
+					</configuration>
+				</plugin>
+
+				<!-- Surefire -->
+				<!-- https://maven.apache.org/surefire/maven-surefire-plugin -->
+				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${version.surefire.plugin}</version>
+				</plugin>
+
+				<!-- Versions -->
+				<!-- https://www.mojohaus.org/versions-maven-plugin/index.html -->
+				<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+				<!-- Aufruf z.B. über "mvn versions:display-property-updates" -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>${version.versions.plugin}</version>
+					<configuration>
+						<!--suppress UnresolvedMavenProperty -->
+						<rulesUri>file:///${session.executionRootDirectory}/maven-version-rules.xml</rulesUri>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>
