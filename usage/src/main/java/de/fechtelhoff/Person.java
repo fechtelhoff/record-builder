@@ -11,7 +11,7 @@ public record Person(
 	int heightInCentimeters) {
 
 	public Person {
-		if (heightInCentimeters <= 0) {
+		if (heightInCentimeters < 0) {
 			throw new IllegalArgumentException("Component 'heightInCentimeters' must be > 0, was %s".formatted(heightInCentimeters));
 		}
 	}

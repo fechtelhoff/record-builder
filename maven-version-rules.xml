@@ -5,7 +5,11 @@
 	<ignoreVersions>
 		<ignoreVersion type="regex">(?i).*[-_\.](alpha)[-_\.]?[0-9]*</ignoreVersion>
 		<ignoreVersion type="regex">(?i).*[-_\.](beta)[-_\.]?[0-9]*</ignoreVersion>
+		<ignoreVersion type="regex">(?i).*[-_\.](b)[-_\.]?[0-9]*</ignoreVersion>
+		<ignoreVersion type="regex">(?i).*[-_\.](cr)[-_\.]?[0-9]*</ignoreVersion>
 		<ignoreVersion type="regex">(?i).*[-_\.](jboss)[-_\.]?[0-9]*</ignoreVersion>
+		<ignoreVersion type="regex">(?i).*[-_\.](m)[-_\.]?[0-9]*</ignoreVersion>
 		<ignoreVersion type="regex">(?i).*[-_\.](redhat)[-_\.]?[0-9]*</ignoreVersion>
+		<ignoreVersion type="regex">(?i).*[-_\.](rc)[-_\.]?[0-9]*</ignoreVersion>
 	</ignoreVersions>
 </ruleset>

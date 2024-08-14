@@ -18,28 +18,52 @@ class PersonTest {
 
 	@Test
 	void Test_with_Constructor_Call() {
+		// Arrange / Act
 		final Person person = new Person(FIRST_NAME, LAST_NAME, BIRTHDAY, HEIGHT);
-		checkPerson(person);
-	}
 
-	@Test
-	void Test_with_generated_Builder() {
-		final Person person = new PersonBuilder()
-			.withFirstName(FIRST_NAME)
-			.withLastName(LAST_NAME)
-			.withBirthDate(BIRTHDAY)
-			.withHeightInCentimeters(HEIGHT)
-			.build();
-		checkPerson(person);
-	}
-
-	private void checkPerson(final Person person) {
+		// Assert
 		assertNotNull(person);
 		assertAll(
 			() -> Assertions.assertEquals(FIRST_NAME, person.firstName()),
 			() -> Assertions.assertEquals(LAST_NAME, person.lastName()),
 			() -> Assertions.assertEquals(BIRTHDAY, person.birthDate()),
 			() -> Assertions.assertEquals(HEIGHT, person.heightInCentimeters())
+		);
+	}
+
+	@Test
+	void Test_with_generated_Builder() {
+		// Arrange / Act
+		final Person person = new PersonBuilder()
+			.withFirstName(FIRST_NAME)
+			.withLastName(LAST_NAME)
+			.withBirthDate(BIRTHDAY)
+			.withHeightInCentimeters(HEIGHT)
+			.build();
+
+		// Assert
+		assertNotNull(person);
+		assertAll(
+			() -> Assertions.assertEquals(FIRST_NAME, person.firstName()),
+			() -> Assertions.assertEquals(LAST_NAME, person.lastName()),
+			() -> Assertions.assertEquals(BIRTHDAY, person.birthDate()),
+			() -> Assertions.assertEquals(HEIGHT, person.heightInCentimeters())
+		);
+	}
+	
+	@Test
+	void Test_with_incomplete_data() {
+		// Arrange / Act
+		final Person person = new PersonBuilder()
+			.withFirstName(FIRST_NAME)
+			.withLastName(LAST_NAME)
+			.build();
+
+		// Assert
+		assertNotNull(person);
+		assertAll(
+			() -> Assertions.assertEquals(FIRST_NAME, person.firstName()),
+			() -> Assertions.assertEquals(LAST_NAME, person.lastName())
 		);
 	}
 }
